@@ -347,6 +347,46 @@ function Contacts({ ctx, onDark }: { ctx: Ctx; onDark?: boolean }) {
 
 /* ---------------- layouts ---------------- */
 
+function ModelFrame({ children }: { ctx: Ctx; children: ReactNode }) {
+  return (
+    <div style={{ width: A4_W, minHeight: A4_H, boxSizing: "border-box", background: "#fff", color: INK, overflowWrap: "anywhere", WebkitPrintColorAdjust: "exact", printColorAdjust: "exact" }}>
+      {children}
+    </div>
+  );
+}
+
+function HeaderIdentity({ ctx, centered = false }: { ctx: Ctx; centered?: boolean }) {
+  return <div style={{ textAlign: centered ? "center" : "left" }}>
+    <h1 style={{ fontFamily: ctx.fonts.heading, fontSize: 31, lineHeight: 1.05, margin: 0, color: INK }}>{ctx.d.name || "O seu nome"}</h1>
+    <div style={{ marginTop: 7, fontSize: 13, fontWeight: 700, color: ctx.accent }}>{ctx.d.job || "Profissão / cargo"}</div>
+    <div style={{ marginTop: 9, display: "flex", flexWrap: "wrap", justifyContent: centered ? "center" : "flex-start", gap: "4px 14px", fontSize: 9.5, color: MUTED }}>
+      {[ctx.d.phone, ctx.d.email, ctx.d.location, ctx.d.link].filter(Boolean).map((x,i)=><span key={i}>{x}</span>)}
+    </div>
+  </div>;
+}
+
+function ContentSections({ ctx }: { ctx: Ctx }) {
+  return <div style={{ display: "grid", gap: ctx.gap, alignContent: "start" }}>
+    {ctx.show("summary") && ctx.d.summary && <section><Title accent={ctx.accent} underline>Perfil profissional</Title><p style={{ margin: 0, fontSize: 11, lineHeight: 1.62, color: MUTED }}>{ctx.d.summary}</p></section>}
+    {ctx.show("experience") && ctx.d.experiences.length > 0 && <section><Title accent={ctx.accent} underline>Experiência profissional</Title><ExperienceList ctx={ctx}/></section>}
+    {ctx.show("education") && ctx.d.education.length > 0 && <section><Title accent={ctx.accent} underline>Formação académica</Title><EducationList ctx={ctx}/></section>}
+    {ctx.d.courses?.length > 0 && <section><Title accent={ctx.accent} underline>Cursos e formação complementar</Title><div style={{display:"grid",gap:ctx.gap*.55}}>{ctx.d.courses.map(x=><div key={x.id}><strong style={{fontSize:11.5}}>{x.name}</strong><div style={{fontSize:9.5,color:MUTED}}>{[x.provider,x.year].filter(Boolean).join(" · ")}</div></div>)}</div></section>}
+    {ctx.d.customSections?.filter(x=>x.title||x.content).map(x=><section key={x.id}><Title accent={ctx.accent} underline>{x.title||"Secção"}</Title><div style={{whiteSpace:"pre-line",fontSize:10.5,lineHeight:1.55,color:MUTED}}>{x.content}</div></section>)}
+  </div>;
+}
+
+function ModelOne({ctx}:{ctx:Ctx}){return <ModelFrame ctx={ctx}><div style={{display:"grid",gridTemplateColumns:"31% 69%",minHeight:A4_H}}><aside style={{background:shade(ctx.accent,-62),color:"#fff",padding:"42px 25px",display:"grid",gap:ctx.gap,alignContent:"start"}}><Photo src={ctx.d.photo} shape="circulo" size={116} accent={ctx.accent}/><section><Title accent="#fff">Contactos</Title><Contacts ctx={ctx} onDark/></section>{ctx.d.skills.length>0&&<section><Title accent="#fff">Competências</Title><Bars items={ctx.d.skills} accent={ctx.accent} onDark/></section>}{ctx.d.languages.length>0&&<section><Title accent="#fff">Idiomas</Title><LanguagesList ctx={ctx} onDark/></section>}</aside><main style={{padding:"48px 38px",display:"grid",gap:ctx.gap,alignContent:"start"}}><HeaderIdentity ctx={ctx}/><ContentSections ctx={ctx}/></main></div></ModelFrame>}
+
+function ModelTwo({ctx}:{ctx:Ctx}){return <ModelFrame ctx={ctx}><div style={{display:"grid",gridTemplateColumns:"69% 31%",minHeight:A4_H}}><main style={{padding:"48px 38px",display:"grid",gap:ctx.gap,alignContent:"start"}}><HeaderIdentity ctx={ctx}/><ContentSections ctx={ctx}/></main><aside style={{background:`${ctx.accent}10`,padding:"42px 24px",display:"grid",gap:ctx.gap,alignContent:"start",borderLeft:`4px solid ${ctx.accent}`}}><Photo src={ctx.d.photo} shape="quadrado" size={110} accent={ctx.accent}/><section><Title accent={ctx.accent}>Contactos</Title><Contacts ctx={ctx}/></section>{ctx.d.skills.length>0&&<section><Title accent={ctx.accent}>Competências</Title><Pills items={ctx.d.skills} accent={ctx.accent}/></section>}{ctx.d.languages.length>0&&<section><Title accent={ctx.accent}>Idiomas</Title><LanguagesList ctx={ctx}/></section>}</aside></div></ModelFrame>}
+
+function ModelThree({ctx}:{ctx:Ctx}){return <ModelFrame ctx={ctx}><header style={{padding:"44px 48px 28px",borderBottom:`4px solid ${ctx.accent}`,display:"flex",gap:24,alignItems:"center"}}><Photo src={ctx.d.photo} shape="recorte" size={105} accent={ctx.accent}/><HeaderIdentity ctx={ctx}/></header><main style={{padding:"30px 48px",display:"grid",gridTemplateColumns:"67% 33%",gap:30}}><ContentSections ctx={ctx}/><aside style={{display:"grid",gap:ctx.gap,alignContent:"start"}}>{ctx.d.skills.length>0&&<section><Title accent={ctx.accent}>Competências</Title><Pills items={ctx.d.skills} accent={ctx.accent}/></section>}{ctx.d.languages.length>0&&<section><Title accent={ctx.accent}>Idiomas</Title><LanguagesList ctx={ctx}/></section>}{ctx.d.certificates.length>0&&<section><Title accent={ctx.accent}>Certificados</Title><CertificatesList ctx={ctx}/></section>}</aside></main></ModelFrame>}
+
+function ModelFour({ctx}:{ctx:Ctx}){return <ModelFrame ctx={ctx}><main style={{padding:"54px 62px",display:"grid",gap:ctx.gap,alignContent:"start"}}><div style={{display:"grid",justifyItems:"center",gap:13,textAlign:"center"}}><Photo src={ctx.d.photo} shape="circulo" size={96} accent={ctx.accent}/><HeaderIdentity ctx={ctx} centered/></div><div style={{height:1,background:LINE}}/><ContentSections ctx={ctx}/><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:32}}>{ctx.d.skills.length>0&&<section><Title accent={ctx.accent}>Competências</Title><Pills items={ctx.d.skills} accent={ctx.accent}/></section>}{ctx.d.languages.length>0&&<section><Title accent={ctx.accent}>Idiomas</Title><LanguagesList ctx={ctx}/></section>}</div></main></ModelFrame>}
+
+function ModelFive({ctx}:{ctx:Ctx}){return <ModelFrame ctx={ctx}><header style={{background:ctx.accent,color:"#fff",padding:"40px 46px",display:"flex",alignItems:"center",gap:22}}><Photo src={ctx.d.photo} shape="circulo" size={100} accent="#fff"/><div style={{flex:1}}><h1 style={{fontFamily:ctx.fonts.heading,fontSize:34,lineHeight:1.05,margin:0}}>{ctx.d.name||"O seu nome"}</h1><div style={{marginTop:7,fontSize:13,fontWeight:700}}>{ctx.d.job}</div><div style={{marginTop:10,display:"flex",flexWrap:"wrap",gap:"4px 15px",fontSize:9.5,opacity:.9}}>{[ctx.d.phone,ctx.d.email,ctx.d.location,ctx.d.link].filter(Boolean).map((x,i)=><span key={i}>{x}</span>)}</div></div></header><main style={{padding:"30px 46px",display:"grid",gridTemplateColumns:"1fr 31%",gap:30}}><ContentSections ctx={ctx}/><aside style={{display:"grid",gap:ctx.gap,alignContent:"start"}}>{ctx.d.skills.length>0&&<section><Title accent={ctx.accent}>Competências</Title><Bars items={ctx.d.skills} accent={ctx.accent}/></section>}{ctx.d.languages.length>0&&<section><Title accent={ctx.accent}>Idiomas</Title><LanguagesList ctx={ctx}/></section>}{ctx.d.interests.length>0&&<section><Title accent={ctx.accent}>Interesses</Title><div style={{fontSize:10,lineHeight:1.6,color:MUTED}}>{ctx.d.interests.join(" · ")}</div></section>}</aside></main></ModelFrame>}
+
+function ModelSix({ctx}:{ctx:Ctx}){return <ModelFrame ctx={ctx}><main style={{padding:"46px 50px",display:"grid",gap:ctx.gap,alignContent:"start"}}><div style={{display:"grid",gridTemplateColumns:"90px 1fr",gap:22,alignItems:"center"}}><Photo src={ctx.d.photo} shape="circulo" size={82} accent={ctx.accent}/><HeaderIdentity ctx={ctx}/></div><div style={{height:3,background:ctx.accent}}/><ContentSections ctx={ctx}/></main></ModelFrame>}
+
 function SidebarLayout({ ctx }: { ctx: Ctx }) {
   const dark = ctx.tpl.variant !== "tint";
   const bg =
@@ -1676,7 +1716,12 @@ export function CVDocument({
         alignContent: "start",
       }}
     >
-      {tpl.layout === "sidebar" && <SidebarLayout ctx={ctx} />}
+      {tpl.id === "modelo-1" && <ModelOne ctx={ctx} />}
+      {tpl.id === "modelo-2" && <ModelTwo ctx={ctx} />}
+      {tpl.id === "modelo-3" && <ModelThree ctx={ctx} />}
+      {tpl.id === "modelo-4" && <ModelFour ctx={ctx} />}
+      {tpl.id === "modelo-5" && <ModelFive ctx={ctx} />}
+      {tpl.id === "modelo-6" && <ModelSix ctx={ctx} />}
       {tpl.layout === "band" && <BandLayout ctx={ctx} />}
       {tpl.layout === "minimal" && <MinimalLayout ctx={ctx} />}
       {tpl.layout === "timeline" && <TimelineLayout ctx={ctx} />}
