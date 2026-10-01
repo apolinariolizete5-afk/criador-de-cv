@@ -16,13 +16,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Crie um currículo profissional em minutos: 20 modelos premium, importação automática do seu CV antigo, edição em tempo real e download em PDF ou Word.",
+          "Crie um currículo profissional em minutos: 6 modelos profissionais, importação automática do seu CV antigo, edição em tempo real e download em PDF ou Word.",
       },
       { property: "og:title", content: "Criador de CV Premium | Moza Empregos" },
       {
         property: "og:description",
         content:
-          "20 modelos premium, preenchimento automático a partir do seu CV antigo e download em PDF ou Word.",
+          "6 modelos profissionais, preenchimento automático a partir do seu CV antigo e download em PDF ou Word.",
       },
     ],
   }),
@@ -110,7 +110,7 @@ function Gallery() {
             </h1>
             <p className="mt-5 max-w-xl text-base text-muted-foreground">
               Carregue o CV que já tem em PDF ou Word, anexe a sua foto e o sistema preenche tudo
-              automaticamente. Escolha um dos 20 modelos premium, edite em tempo real e descarregue
+              automaticamente. Escolha um dos 6 modelos profissionais, edite em tempo real e descarregue
               em PDF ou Word.
             </p>
             <div className="mt-7 flex flex-wrap gap-3 [&>button]:h-12">
@@ -125,7 +125,7 @@ function Gallery() {
                   document.getElementById("modelos")?.scrollIntoView({ behavior: "smooth" })
                 }
               >
-                Ver os 20 modelos
+                Ver os 6 modelos
               </Button>
             </div>
             <ul className="mt-8 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
@@ -143,10 +143,10 @@ function Gallery() {
           </div>
           <div className="relative hidden justify-center lg:flex">
             <div className="rotate-[-4deg] rounded-md bg-card paper-shadow">
-              <CVThumb data={sampleCV} theme={defaultTheme("aurora")} width={300} />
+              <CVThumb data={sampleCV} theme={defaultTheme("modelo-1")} width={300} />
             </div>
             <div className="ml-[-70px] mt-14 rotate-[4deg] rounded-md bg-card paper-shadow">
-              <CVThumb data={{ ...sampleCV, ...sampleVariants["b"] }} theme={defaultTheme("editorial")} width={300} />
+              <CVThumb data={{ ...sampleCV, ...sampleVariants["b"] }} theme={defaultTheme("modelo-3")} width={300} />
             </div>
           </div>
         </div>
