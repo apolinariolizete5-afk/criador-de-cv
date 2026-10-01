@@ -349,7 +349,20 @@ function Contacts({ ctx, onDark }: { ctx: Ctx; onDark?: boolean }) {
 
 function ModelFrame({ children }: { ctx: Ctx; children: ReactNode }) {
   return (
-    <div style={{ width: A4_W, minHeight: A4_H, boxSizing: "border-box", background: "#fff", color: INK, overflowWrap: "anywhere", WebkitPrintColorAdjust: "exact", printColorAdjust: "exact" }}>
+    <div
+      style={{
+        width: A4_W,
+        minHeight: A4_H,
+        boxSizing: "border-box",
+        background: "#fff",
+        color: INK,
+        overflowWrap: "anywhere",
+        WebkitPrintColorAdjust: "exact",
+        printColorAdjust: "exact",
+        breakInside: "auto",
+        pageBreakInside: "auto",
+      }}
+    >
       {children}
     </div>
   );
@@ -365,14 +378,91 @@ function HeaderIdentity({ ctx, centered = false }: { ctx: Ctx; centered?: boolea
   </div>;
 }
 
+function ResumeSection({
+  children,
+  style,
+}: {
+  children: ReactNode;
+  style?: CSSProperties;
+}) {
+  return (
+    <section
+      style={{
+        breakInside: "avoid",
+        pageBreakInside: "avoid",
+        minWidth: 0,
+        ...style,
+      }}
+    >
+      {children}
+    </section>
+  );
+}
+
 function ContentSections({ ctx }: { ctx: Ctx }) {
-  return <div style={{ display: "grid", gap: ctx.gap, alignContent: "start" }}>
-    {ctx.show("summary") && ctx.d.summary && <section><Title accent={ctx.accent} underline>Perfil profissional</Title><p style={{ margin: 0, fontSize: 11, lineHeight: 1.62, color: MUTED }}>{ctx.d.summary}</p></section>}
-    {ctx.show("experience") && ctx.d.experiences.length > 0 && <section><Title accent={ctx.accent} underline>Experiência profissional</Title><ExperienceList ctx={ctx}/></section>}
-    {ctx.show("education") && ctx.d.education.length > 0 && <section><Title accent={ctx.accent} underline>Formação académica</Title><EducationList ctx={ctx}/></section>}
-    {ctx.d.courses?.length > 0 && <section><Title accent={ctx.accent} underline>Cursos e formação complementar</Title><div style={{display:"grid",gap:ctx.gap*.55}}>{ctx.d.courses.map(x=><div key={x.id}><strong style={{fontSize:11.5}}>{x.name}</strong><div style={{fontSize:9.5,color:MUTED}}>{[x.provider,x.year].filter(Boolean).join(" · ")}</div></div>)}</div></section>}
-    {ctx.d.customSections?.filter(x=>x.title||x.content).map(x=><section key={x.id}><Title accent={ctx.accent} underline>{x.title||"Secção"}</Title><div style={{whiteSpace:"pre-line",fontSize:10.5,lineHeight:1.55,color:MUTED}}>{x.content}</div></section>)}
-  </div>;
+  const courses = ctx.show("courses") ? ctx.d.courses ?? [] : [];
+  const customSections = ctx.show("custom")
+    ? (ctx.d.customSections ?? []).filter((x) => x.title.trim() || x.content.trim())
+    : [];
+
+  return (
+    <div style={{ display: "grid", gap: ctx.gap, alignContent: "start", minWidth: 0 }}>
+      {ctx.show("summary") && ctx.d.summary && (
+        <ResumeSection>
+          <Title accent={ctx.accent} underline>Perfil profissional</Title>
+          <p style={{ margin: 0, fontSize: 11, lineHeight: 1.62, color: MUTED }}>
+            {ctx.d.summary}
+          </p>
+        </ResumeSection>
+      )}
+
+      {ctx.show("experience") && ctx.d.experiences.length > 0 && (
+        <ResumeSection>
+          <Title accent={ctx.accent} underline>Experiência profissional</Title>
+          <ExperienceList ctx={ctx} />
+        </ResumeSection>
+      )}
+
+      {ctx.show("education") && ctx.d.education.length > 0 && (
+        <ResumeSection>
+          <Title accent={ctx.accent} underline>Formação académica</Title>
+          <EducationList ctx={ctx} />
+        </ResumeSection>
+      )}
+
+      {courses.length > 0 && (
+        <ResumeSection>
+          <Title accent={ctx.accent} underline>Cursos e formação complementar</Title>
+          <div style={{ display: "grid", gap: ctx.gap * 0.55 }}>
+            {courses.map((x) => (
+              <div key={x.id}>
+                <strong style={{ fontSize: 11.5 }}>{x.name}</strong>
+                <div style={{ fontSize: 9.5, color: MUTED }}>
+                  {[x.provider, x.year].filter(Boolean).join(" · ")}
+                </div>
+              </div>
+            ))}
+          </div>
+        </ResumeSection>
+      )}
+
+      {ctx.show("references") && ctx.d.references.length > 0 && (
+        <ResumeSection>
+          <Title accent={ctx.accent} underline>Referências</Title>
+          <ReferencesList ctx={ctx} />
+        </ResumeSection>
+      )}
+
+      {customSections.map((x) => (
+        <ResumeSection key={x.id}>
+          <Title accent={ctx.accent} underline>{x.title || "Secção"}</Title>
+          <div style={{ whiteSpace: "pre-line", fontSize: 10.5, lineHeight: 1.55, color: MUTED }}>
+            {x.content}
+          </div>
+        </ResumeSection>
+      ))}
+    </div>
+  );
 }
 
 function ModelOne({ctx}:{ctx:Ctx}){return <ModelFrame ctx={ctx}><div style={{display:"grid",gridTemplateColumns:"31% 69%",minHeight:A4_H}}><aside style={{background:shade(ctx.accent,-62),color:"#fff",padding:"42px 25px",display:"grid",gap:ctx.gap,alignContent:"start"}}><Photo src={ctx.d.photo} shape="circulo" size={116} accent={ctx.accent}/><section><Title accent="#fff">Contactos</Title><Contacts ctx={ctx} onDark/></section>{ctx.d.skills.length>0&&<section><Title accent="#fff">Competências</Title><Bars items={ctx.d.skills} accent={ctx.accent} onDark/></section>}{ctx.d.languages.length>0&&<section><Title accent="#fff">Idiomas</Title><LanguagesList ctx={ctx} onDark/></section>}</aside><main style={{padding:"48px 38px",display:"grid",gap:ctx.gap,alignContent:"start"}}><HeaderIdentity ctx={ctx}/><ContentSections ctx={ctx}/></main></div></ModelFrame>}
@@ -1703,35 +1793,31 @@ export function CVDocument({
     fonts,
   };
 
+  const model = {
+    "modelo-1": <ModelOne ctx={ctx} />,
+    "modelo-2": <ModelTwo ctx={ctx} />,
+    "modelo-3": <ModelThree ctx={ctx} />,
+    "modelo-4": <ModelFour ctx={ctx} />,
+    "modelo-5": <ModelFive ctx={ctx} />,
+    "modelo-6": <ModelSix ctx={ctx} />,
+  }[tpl.id] ?? <ModelOne ctx={ctx} />;
+
   return (
     <div
       id={id}
       style={{
         width: A4_W,
         minHeight: A4_H,
+        boxSizing: "border-box",
         background: "#fff",
         color: INK,
         fontFamily: fonts.body,
-        display: "grid",
-        alignContent: "start",
+        overflowWrap: "anywhere",
+        WebkitPrintColorAdjust: "exact",
+        printColorAdjust: "exact",
       }}
     >
-      {tpl.id === "modelo-1" && <ModelOne ctx={ctx} />}
-      {tpl.id === "modelo-2" && <ModelTwo ctx={ctx} />}
-      {tpl.id === "modelo-3" && <ModelThree ctx={ctx} />}
-      {tpl.id === "modelo-4" && <ModelFour ctx={ctx} />}
-      {tpl.id === "modelo-5" && <ModelFive ctx={ctx} />}
-      {tpl.id === "modelo-6" && <ModelSix ctx={ctx} />}
-      {tpl.layout === "band" && <BandLayout ctx={ctx} />}
-      {tpl.layout === "minimal" && <MinimalLayout ctx={ctx} />}
-      {tpl.layout === "timeline" && <TimelineLayout ctx={ctx} />}
-      {tpl.layout === "split" && <SplitLayout ctx={ctx} />}
-      {tpl.layout === "hero" && <HeroLayout ctx={ctx} />}
-      {tpl.layout === "grid" && <GridLayout ctx={ctx} />}
-      {tpl.layout === "mono" && <MonoLayout ctx={ctx} />}
-      {tpl.layout === "stripe" && <StripeLayout ctx={ctx} />}
-      {tpl.layout === "column" && <ColumnLayout ctx={ctx} />}
-      <Extras ctx={ctx} />
+      {model}
     </div>
   );
 }
