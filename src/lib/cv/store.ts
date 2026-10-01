@@ -4,7 +4,7 @@ import { getTemplate } from "@/components/cv/CVDocument";
 
 const KEY = "moza-cv-v1";
 
-export const defaultTheme = (templateId = "aurora"): CVTheme => {
+export const defaultTheme = (templateId = "modelo-1"): CVTheme => {
   const tpl = getTemplate(templateId);
   return {
     templateId: tpl.id,
